@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚨 SF Earthquake Alert System</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="🚨 SF Earthquake Alert System">
+    <meta property="og:description" content="Real-time earthquake monitoring within 200km of San Francisco. Interactive map showing recent seismic activity from USGS data.">
+    <meta property="og:image" content="{{ url_for('static', filename='og-image.svg', _external=True) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="🚨 SF Earthquake Alert System">
+    <meta name="twitter:description" content="Real-time earthquake monitoring within 200km of San Francisco. Interactive map showing recent seismic activity from USGS data.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='og-image.svg', _external=True) }}">
+    
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <!-- Leaflet JS -->
