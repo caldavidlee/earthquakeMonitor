@@ -30,6 +30,8 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 def get_earthquake():
     """Fetch recent earthquakes near San Francisco from USGS API"""
+
+    
     try:
         # USGS FDSN Event Web Service - Query for last 24 hours
         base_url = "https://earthquake.usgs.gov/fdsnws/event/1/query"
@@ -37,7 +39,13 @@ def get_earthquake():
         # Get earthquakes from the last 24 hours
         end_time = datetime.utcnow()
         start_time = end_time - timedelta(days=1)
-        
+        params = {
+            'format': 'geojson',
+            'starttime': start_time.strftime('%Y-%m-%dT%H:%M:%S'),
+            'endtime': end_time.strftime('%Y-%m-%dT%H:%M:%S'),
+            'minmagnitude': 4.5  # Significant earthquakes worldwide
+        }
+        """
         params = {
             'format': 'geojson',
             'starttime': start_time.strftime('%Y-%m-%dT%H:%M:%S'),
@@ -48,6 +56,7 @@ def get_earthquake():
             'maxlongitude': SF_LON + 2,
             'minmagnitude': 2.0  # Only show magnitude 2.0+
         }
+        """
         
         response = requests.get(base_url, params=params, timeout=10)
         response.raise_for_status()
@@ -69,6 +78,8 @@ def get_earthquake():
                     'time': datetime.fromtimestamp(properties.get('time') / 1000).strftime('%Y-%m-%d %H:%M:%S UTC'),
                     'distance_km': round(distance, 1),
                     'depth_km': round(coords[2], 1),
+                    'latitude': lat,
+                    'longitude': lon,
                     'url': properties.get('url'),
                     'alert': properties.get('alert'),
                     'felt': properties.get('felt'),

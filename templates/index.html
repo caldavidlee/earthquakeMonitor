@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚨 SF Earthquake Alert System</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -223,6 +227,21 @@
             opacity: 0.8;
             font-size: 0.9em;
         }
+
+        .map-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -244,6 +263,11 @@
             <!-- Big alerts will appear here -->
         </div>
 
+        <div class="map-container">
+            <h2 style="margin-bottom: 20px;">🗺️ Earthquake Map</h2>
+            <div id="map"></div>
+        </div>
+
         <div class="earthquake-list">
             <h2 style="margin-bottom: 20px;">📊 Recent Earthquakes (24 hours)</h2>
             <div id="earthquakeList">
@@ -258,6 +282,35 @@
     <script>
         let lastEarthquakeCount = 0;
         let isFirstLoad = true;
+
+        // Initialize Leaflet map centered on San Francisco
+        let map = L.map('map').setView([37.7749, -122.4194], 8);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Add circle showing 200km monitoring radius
+        L.circle([37.7749, -122.4194], {
+            color: '#667eea',
+            fillColor: '#667eea',
+            fillOpacity: 0.1,
+            radius: 200000  // 200km in meters
+        }).addTo(map).bindPopup('<b>200km Monitoring Radius</b>');
+
+        // Add marker for San Francisco
+        L.marker([37.7749, -122.4194], {
+            icon: L.divIcon({
+                className: 'sf-marker',
+                html: '🏙️',
+                iconSize: [30, 30]
+            })
+        }).addTo(map).bindPopup('<b>San Francisco</b>');
+
+        // Store earthquake markers to clear them later
+        let earthquakeMarkers = [];
 
         // Request notification permission on load
         if ('Notification' in window && Notification.permission === 'default') {
@@ -341,6 +394,9 @@
                                 No earthquakes detected in the last 24 hours within 200km of San Francisco
                             </div>
                         `;
+                        // Clear earthquake markers from map
+                        earthquakeMarkers.forEach(marker => map.removeLayer(marker));
+                        earthquakeMarkers = [];
                     } else {
                         // Show big alert for significant earthquakes (magnitude 3.0+)
                         const significantQuakes = data.earthquakes.filter(eq => eq.magnitude >= 3.0);
@@ -352,6 +408,41 @@
                                 container.appendChild(createBigAlert(eq));
                             });
                         }
+
+                        // Clear previous earthquake markers
+                        earthquakeMarkers.forEach(marker => map.removeLayer(marker));
+                        earthquakeMarkers = [];
+
+                        // Add earthquakes to map
+                        data.earthquakes.forEach(earthquake => {
+                            const lat = earthquake.latitude;
+                            const lon = earthquake.longitude;
+                            const magnitude = earthquake.magnitude;
+                            
+                            // Determine marker color based on magnitude
+                            let color = getMagnitudeColor(magnitude);
+                            
+                            // Create circle marker
+                            const marker = L.circleMarker([lat, lon], {
+                                radius: magnitude * 3,  // Size based on magnitude
+                                fillColor: color,
+                                color: '#fff',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.7
+                            }).addTo(map);
+                            
+                            // Add popup with earthquake details
+                            marker.bindPopup(`
+                                <b>Magnitude ${magnitude}</b><br>
+                                ${earthquake.place}<br>
+                                Distance: ${earthquake.distance_km} km from SF<br>
+                                Depth: ${earthquake.depth_km} km<br>
+                                ${earthquake.time}
+                            `);
+                            
+                            earthquakeMarkers.push(marker);
+                        });
 
                         // Show all earthquakes in list
                         data.earthquakes.forEach(earthquake => {
