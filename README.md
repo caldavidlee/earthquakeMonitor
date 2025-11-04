@@ -120,6 +120,47 @@ Key parameters in `main.py`:
 - **Mapping**: Leaflet.js 1.9.4 with OpenStreetMap tiles
 - **Math**: Haversine formula for distance calculations
 
+## Deployment
+
+This application is ready for deployment on **Render**:
+
+### Deploy to Render
+
+1. **Push your code to GitHub** (if not already done):
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin YOUR_GITHUB_REPO_URL
+git push -u origin main
+```
+
+2. **Sign up at [render.com](https://render.com)** (free account, no credit card required)
+
+3. **Create a new Web Service**:
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Render will auto-detect the `render.yaml` configuration
+
+4. **Deploy!**
+   - Click "Create Web Service"
+   - Render will automatically build and deploy your app
+   - Your app will be live at `https://your-app-name.onrender.com`
+
+### Configuration Files Included
+
+- `render.yaml` - Render deployment configuration
+- `runtime.txt` - Python version specification
+- `Procfile` - Process file for deployment
+- `requirements.txt` - Python dependencies
+
+### Notes
+
+- Free tier apps sleep after 15 minutes of inactivity
+- First request after sleep takes ~30 seconds to wake up
+- Automatic HTTPS is included
+- Auto-deploys on git push to main branch
+
 ## Data Source
 
 Earthquake data is provided by the [United States Geological Survey (USGS)](https://earthquake.usgs.gov/) Earthquake Hazards Program.
